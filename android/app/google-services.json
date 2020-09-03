@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "687727751975",
+    "firebase_url": "https://productivity-4.firebaseio.com",
+    "project_id": "productivity-4",
+    "storage_bucket": "productivity-4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687727751975:android:8363b5981d5539edc4af02",
+        "android_client_info": {
+          "package_name": "com.ady.product_4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "687727751975-9b756c75cjcvven8n4jpuq3cf62qkeic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjk-3K2QHYgIhW-Qb0nSeVc8QsAB1zX2o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "687727751975-9b756c75cjcvven8n4jpuq3cf62qkeic.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
