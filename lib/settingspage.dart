@@ -11,7 +11,13 @@ class _SettingsPageState extends State<SettingsPage> {
   // Global Variables
   TextEditingController userNameController =
       TextEditingController(); // Controller for username
+  TextEditingController dailyStepsGoalController = TextEditingController();
+  TextEditingController dailyCaloriesGoalController = TextEditingController();
+  TextEditingController dailySleepGoalController = TextEditingController();
   String userName; // Variable that holds username
+  String dailyStepsGoal;
+  String dailyCaloriesGoal;
+  String dailySleepGoal;
 
   // Global Functions
 
@@ -21,9 +27,29 @@ class _SettingsPageState extends State<SettingsPage> {
     // Part 1 - USERNAME
     // Getting the username from the text controller
     String userName = userNameController.text;
+    // Getting the Steps Tracker from the text controller
+    String dailyStepsGoal = dailyStepsGoalController.text;
+    // Getting the Calories Tracker from the text controller
+    String dailyCaloriesGoal = dailyCaloriesGoalController.text;
+    // Getting the Sleep Tracker from the text controller
+    String dailySleepGoal = dailySleepGoalController.text;
     // Setting the username
-    prefs.setString("User Name", userName);
+    if (userName != "") {
+      prefs.setString("User Name", userName);
+    }
     print("Username: $userName Set");
+    // Setting the Steps target
+    if (dailyStepsGoal != "") {
+      prefs.setInt("Steps Target", int.parse(dailyStepsGoal));
+    }
+    // Setting the calories target
+    if (dailyCaloriesGoal != "") {
+      prefs.setInt("Caloric Target", int.parse(dailyCaloriesGoal));
+    }
+    // Setting the sleep target
+    if (dailySleepGoal != "") {
+      prefs.setInt("Sleep Target", int.parse(dailySleepGoal));
+    }
 
     // Setting the toast
     Fluttertoast.showToast(msg: "New Settings Saved");
@@ -35,15 +61,49 @@ class _SettingsPageState extends State<SettingsPage> {
     return prefs.getString("User Name").toString();
   }
 
+  // Function that gets the steps for the hint
+  Future<String> getStepsGoalForHint() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt("Steps Target").toString();
+  }
+
+  // Function that gets the calories for the hint
+  Future<String> getCaloriesGoalForHint() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt("Caloric Target").toString();
+  }
+
+  // Function that gets the calories for the hint
+  Future<String> getSleepGoalForHint() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt("Sleep Target").toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Getting the username for hint
     getUserNameForHint().then((value) {
       setState(() {
         userName = value;
-        print(userName);
       });
     });
+    // Getting the steps goal
+    getStepsGoalForHint().then((value) {
+      setState(() {
+        dailyStepsGoal = value;
+      });
+    });
+    getCaloriesGoalForHint().then((value) {
+      setState(() {
+        dailyCaloriesGoal = value;
+      });
+    });
+    getSleepGoalForHint().then((value) {
+      setState(() {
+        dailySleepGoal = value;
+      });
+    });
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -85,7 +145,7 @@ class _SettingsPageState extends State<SettingsPage> {
             decoration: InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.green,
+                  color: Colors.purpleAccent,
                   width: 5.0,
                 ),
               ),
@@ -94,6 +154,134 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               border: InputBorder.none,
               hintText: userName,
+              hintStyle: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          ),
+          Divider(
+            color: Colors.red,
+          ),
+          Divider(
+            color: Colors.pink,
+          ),
+          Divider(
+            color: Colors.lightBlueAccent,
+          ),
+          Text(
+            "Digital Settings",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.blue,
+              fontWeight: FontWeight.bold,
+              fontSize: 40,
+            ),
+          ),
+          Text("SPACE"),
+          Text("SPACE"),
+          Text(
+            "Daily Sleep Goal:",
+            style: TextStyle(
+              color: Colors.blue,
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text("SPACE"),
+          TextField(
+            controller: dailySleepGoalController,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+            ),
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.blueAccent,
+                  width: 5.0,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 5.0),
+              ),
+              border: InputBorder.none,
+              hintText: dailySleepGoal,
+              hintStyle: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          ),
+          Text("SPACE"),
+          Text("SPACE"),
+          Divider(
+            color: Colors.greenAccent,
+          ),
+          Text(
+            "Health Settings",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.greenAccent,
+              fontWeight: FontWeight.bold,
+              fontSize: 40,
+            ),
+          ),
+          Text("SPACE"),
+          Text("SPACE"),
+          Text(
+            "Daily Steps Goal:",
+            style: TextStyle(
+              color: Colors.greenAccent,
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text("SPACE"),
+          TextField(
+            controller: dailyStepsGoalController,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+            ),
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.green,
+                  width: 5.0,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 5.0),
+              ),
+              border: InputBorder.none,
+              hintText: dailyStepsGoal,
+              hintStyle: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          ),
+          Text("SPACE"),
+          Text("SPACE"),
+          Text(
+            "Daily Calories Goal:",
+            style: TextStyle(
+              color: Colors.greenAccent,
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text("SPACE"),
+          TextField(
+            controller: dailyCaloriesGoalController,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+            ),
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.green,
+                  width: 5.0,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 5.0),
+              ),
+              border: InputBorder.none,
+              hintText: dailyCaloriesGoal,
               hintStyle: TextStyle(color: Colors.white, fontSize: 20),
             ),
           ),

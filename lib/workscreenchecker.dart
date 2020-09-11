@@ -7,7 +7,8 @@ import './workscreen.dart';
 class WorkScreenChecker extends StatelessWidget {
   // GLobal Variables
   List paramater;
-  WorkScreenChecker(this.paramater);
+  String mode;
+  WorkScreenChecker(this.paramater, this.mode);
   List<Widget> listOfTaskButtons = [];
   static final DateTime now = DateTime.now();
   static final DateFormat formatter = DateFormat('dd-MM-yyy');
@@ -19,7 +20,6 @@ class WorkScreenChecker extends StatelessWidget {
   // Function that updates wether values are checked
   Future checkTheTask(String taskName, String taskDueDate,
       String taskDescription, String isCompleted) async {
-    print("hkhkhkhk");
     await FirebaseFirestore.instance
         .collection("taskData")
         .doc("taskName")
@@ -43,9 +43,7 @@ class WorkScreenChecker extends StatelessWidget {
       String isCompleted = task["Is Completed"];
       Widget taskNameButton = RaisedButton(
         onPressed: () async {
-          if (formattedDate != taskDueDate) {
-            print(taskName);
-            print("hkhkhkhk");
+          if (mode == "long") {
             await FirebaseFirestore.instance
                 .collection("taskData")
                 .doc(taskName)
@@ -86,11 +84,18 @@ class WorkScreenChecker extends StatelessWidget {
         ),
       );
     });
-
-    return SimpleDialog(
-      backgroundColor: Colors.white,
-      title: const Text('Select Task That Was Completed:'),
-      children: listOfTaskButtons,
-    );
+    if (mode == "single") {
+      return SimpleDialog(
+        backgroundColor: Colors.white,
+        title: const Text('Select Task That Was Completed:'),
+        children: listOfTaskButtons,
+      );
+    } else if (mode == "long") {
+      return SimpleDialog(
+        backgroundColor: Colors.white,
+        title: const Text('Select Task To Be Deleted:'),
+        children: listOfTaskButtons,
+      );
+    }
   }
 }

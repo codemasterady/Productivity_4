@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import './workscreentaskcard.dart';
 import './addtaskwidget.dart';
@@ -23,6 +24,8 @@ class _WorkScreenState extends State<WorkScreen> {
   // Global Variables (COnstructor)
   double workProgress = 0.5;
   // int x = 7;
+  bool showWholeList = false;
+  Icon showWholeListIcon = Icon(Icons.expand_more);
   List widgetsToBeDisplayed;
   bool valueLoadedFromDatabase = false;
   List traitsThatWereDisplayed;
@@ -80,7 +83,7 @@ class _WorkScreenState extends State<WorkScreen> {
   }
 
   // Function to get the database
-  Future<List> gettingListOfCard() async {
+  Future<List> gettingListOfCard(bool showWholeList) async {
     List<Map> listOfCardTraits = [];
     List<Map> returningList = [];
     List<Map> listOfToday = [];
@@ -105,18 +108,26 @@ class _WorkScreenState extends State<WorkScreen> {
     });
     //listOfCardTraits = traitToListConverter(listOfCardTraits);
     //print(listOfCardTraits);
+
     for (Map item in listOfCardTraits) {
+      String newTomorrow = "";
       var yesterDayString = Jiffy()
         ..add(days: 1)
         ..startOf(Units.DAY);
       yesterDayString.format("dd-MM-yyyy");
       String yesterday = yesterDayString.dateTime.toString();
-      String newTomorrow = "";
       for (int i = 0; i < 10; i++) {
         String currElement = yesterday[i];
         newTomorrow = newTomorrow + currElement;
       }
-      newTomorrow.replaceAll("-", "/");
+      newTomorrow = newTomorrow.split("-").join("/").toString();
+      List newTomorrowSplit = newTomorrow.split("/");
+      String day = newTomorrowSplit[2];
+      String year = newTomorrowSplit[0];
+      newTomorrowSplit[2] = year;
+      newTomorrowSplit[0] = day;
+      String tomorrow = newTomorrowSplit.join("/");
+      tomorrow = tomorrow.toString();
       String today = formattedDate.toString();
       today = today.replaceAll("-", "/");
       // print("1" + item["Task Due Date"]);
@@ -124,15 +135,18 @@ class _WorkScreenState extends State<WorkScreen> {
       if (item["Task Due Date"] == today) {
         // listOfCardTraits.remove(item);
         listOfToday.add(item);
+      } else if (item["Task Due Date"] == tomorrow) {
+        listOfTomorrow.add(item);
       }
     }
 
-    returningList =
-        // listOfToday
-        // +
-        listOfCardTraits;
+    returningList = listOfToday + listOfTomorrow;
 
-    return returningList.toList();
+    if (showWholeList == false) {
+      return returningList.toList();
+    } else {
+      return listOfCardTraits.toList();
+    }
   }
 
   // Function to add value into the shared preference
@@ -218,9 +232,12 @@ class _WorkScreenState extends State<WorkScreen> {
       }
     }
     totalNum = numTrue + numFalse;
-    returningValue = numTrue / totalNum;
-    // print(returningValue);
-    return returningValue;
+    if (totalNum <= 0) {
+      return 0;
+    } else {
+      returningValue = numTrue / totalNum;
+      return returningValue;
+    }
   }
 
   // Function to sort the list
@@ -241,7 +258,7 @@ class _WorkScreenState extends State<WorkScreen> {
   @override
   Widget build(BuildContext context) {
     // Getting the list of card
-    gettingListOfCard().then((value) async {
+    gettingListOfCard(showWholeList).then((value) async {
       //widgetsToBeDisplayed = await [];
       setState(() {
         widgetsToBeDisplayed = value;
@@ -320,6 +337,22 @@ class _WorkScreenState extends State<WorkScreen> {
           title: Text("Work"),
           actions: [
             IconButton(
+                icon: showWholeListIcon,
+                onPressed: () {
+                  if (showWholeList == false) {
+                    showWholeList = true;
+                    Fluttertoast.showToast(msg: "Expanding List");
+                    showWholeListIcon = Icon(Icons.expand_less);
+                  } else {
+                    showWholeList = false;
+                    Fluttertoast.showToast(msg: "Reducing List");
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => WorkScreen({})));
+                  }
+                }),
+            IconButton(
               icon: Icon(Icons.add_box),
               onPressed: () {
                 Navigator.push(
@@ -349,6 +382,7 @@ class _WorkScreenState extends State<WorkScreen> {
                 width: 375,
                 lineHeight: 17,
                 percent: workProgress,
+                animateFromLastPercent: true,
                 progressColor: workProgressIndicatorColor,
                 animation: true,
                 animationDuration: 1000,
@@ -367,11 +401,20 @@ class _WorkScreenState extends State<WorkScreen> {
                 height: 500,
                 width: 700,
                 child: GestureDetector(
+                  onLongPress: () {
+                    setState(() {
+                      showDialog(
+                          context: context,
+                          child: WorkScreenChecker(
+                              traitsThatWereDisplayed, "long"));
+                    });
+                  },
                   onTap: () {
                     setState(() {
                       showDialog(
                           context: context,
-                          child: WorkScreenChecker(traitsThatWereDisplayed));
+                          child: WorkScreenChecker(
+                              traitsThatWereDisplayed, "single"));
                     });
                   },
                   child: ListWheelScrollView(

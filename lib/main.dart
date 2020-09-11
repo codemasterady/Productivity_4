@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './settingspage.dart';
 import './homeCard.dart';
 import './workscreen.dart';
+import 'Health/mainhealth.dart';
 
 void main() async {
   runApp(MaterialApp(
@@ -28,19 +29,34 @@ class MyAppState extends State {
   String greetingStatement;
   String userName;
   double workProgress = 0;
-  double relationshipsProgress = 0.1; // Dont change 4 of em
-  double digitalProgress = 0.1;
-  double healthProgress = 0.1;
+  double relationshipsProgress = 0; // Dont change 4 of em
+  double digitalProgress = 0;
+  double healthProgress = 0;
+
   // Function to navigate to the 4 basic screens
   void goToWork() {
-    Navigator.push(context, new MaterialPageRoute(builder: (context) {
-      return WorkScreen({});
-    }));
+    Navigator.push(
+      context,
+      new MaterialPageRoute(
+        builder: (context) {
+          return WorkScreen({});
+        },
+      ),
+    );
   }
 
   void goToSocial() {}
   void goToDigital() {}
-  void goToHealth() {}
+  void goToHealth() {
+    Navigator.push(
+      context,
+      new MaterialPageRoute(
+        builder: (context) {
+          return MainHealth();
+        },
+      ),
+    );
+  }
 
   // Functions for ling press
   void goToWorkLong() {
@@ -72,16 +88,19 @@ class MyAppState extends State {
   // Function to get the shared prefferences
   Future<double> getWorkProgress() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getDouble("Work Progress").toDouble();
+    double temp = prefs.getDouble("Work Progress");
+    return temp.toDouble();
   }
 
   Widget build(BuildContext context) {
-    loadUserName().then((value) async {
-      // await getWorkProgress().then((value) {
-      //   workProgress = value;
-      // });
+    loadUserName().then((value) {
       setState(() {
         userName = value;
+      });
+    });
+    getWorkProgress().then((value) {
+      setState(() {
+        workProgress = value;
       });
     });
     stateDeterminerUsingTime();
